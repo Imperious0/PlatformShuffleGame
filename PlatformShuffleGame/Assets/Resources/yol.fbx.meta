@@ -3,7 +3,22 @@ guid: aa8af4adc4a6165438382d6ccb75a852
 ModelImporter:
   serializedVersion: 21202
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material.010
+    second: {fileID: 2100000, guid: eff7fb0ebd8d88342bf2e670ce139a97, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: asfalt
+    second: {fileID: 2100000, guid: 44430bf2121218e4c81a336449a0abbf, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: "kenarl\u0131k"
+    second: {fileID: 2100000, guid: 83904e014707caf4fa0b3e83a5537a0f, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

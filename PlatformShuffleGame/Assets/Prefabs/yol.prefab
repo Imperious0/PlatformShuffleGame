@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5271678798413308852}
   - component: {fileID: 9117282885104905233}
   - component: {fileID: 6441254896162167003}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: yol
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -61,9 +61,9 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -6085406366076607991, guid: aa8af4adc4a6165438382d6ccb75a852, type: 3}
-  - {fileID: -2657970071089792757, guid: aa8af4adc4a6165438382d6ccb75a852, type: 3}
-  - {fileID: -6087771358165109452, guid: aa8af4adc4a6165438382d6ccb75a852, type: 3}
+  - {fileID: 2100000, guid: eff7fb0ebd8d88342bf2e670ce139a97, type: 2}
+  - {fileID: 2100000, guid: 44430bf2121218e4c81a336449a0abbf, type: 2}
+  - {fileID: 2100000, guid: 83904e014707caf4fa0b3e83a5537a0f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

@@ -10,8 +10,13 @@ public class GameManager : MonoBehaviour
 
     public static GameManager Instance { get => instance; }
 
+
     [SerializeField] private MotionCapturer mCapture;
 
+    [SerializeField, Range(0, 1f)] private float _carShuffleDelay = 0.25f;
+    private int _roadInstanceCount = 12;
+
+    public int RoadInstanceCount { get => _roadInstanceCount; }
 
     private void Awake()
     {
@@ -19,6 +24,7 @@ public class GameManager : MonoBehaviour
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
+            _roadInstanceCount = GameObject.FindGameObjectsWithTag("Road").Length;
         }
         else
         {
@@ -37,7 +43,7 @@ public class GameManager : MonoBehaviour
             yield return new WaitUntil(() => { return mCapture.getCurrentMotion().Equals(MotionType.MOVEMENT); });
             while (mCapture.getCurrentMotion().Equals(MotionType.MOVEMENT))
             {
-                yield return new WaitForSeconds(0.25f);
+                yield return new WaitForSeconds(_carShuffleDelay);
                 mCapture.signalMotion();
 
                 if(mCapture.getHorizontalMovementForce() != 0f)

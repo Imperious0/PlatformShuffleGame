@@ -12,6 +12,7 @@ public class CarController : MonoBehaviour
     private Renderer _renderer;
 
     private float _currentAnimationTime = 0f;
+
     [SerializeField, Range(0,5)] private float _carAnimationSpeed = 0.125f;
 
     private void Awake()
@@ -56,6 +57,10 @@ public class CarController : MonoBehaviour
 
     public void Die()
     {
-        _renderer.enabled = false;
+        gameObject.SetActive(false);
+    }
+    public void Respawn()
+    {
+        gameObject.SetActive(true);
     }
 }

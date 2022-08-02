@@ -187,7 +187,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c817a2047f7a9a4419db8cafa9dfa98e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _carAnimationSpeed: 1.5
+  _carAnimationSpeed: 2
 --- !u!1 &9192615554442460400
 GameObject:
   m_ObjectHideFlags: 0

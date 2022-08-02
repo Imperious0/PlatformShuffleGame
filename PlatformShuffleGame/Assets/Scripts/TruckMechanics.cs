@@ -5,11 +5,14 @@ using UnityEngine;
 public class TruckMechanics : MonoBehaviour
 {
     public event EventHandler<TruckEventDoneArgs> TruckDoneMissionEvent;
+    public event EventHandler<TruckTakePrizeArgs> TruckTakePrizeEvent;
 
     [SerializeField] private Vector3 _carStartPoint = Vector3.zero;
     [SerializeField] private Vector3 _carPositionOffset = Vector3.zero;
 
     List<CarController> _cars;
+
+    public int CarAmount { get => _cars.Count; }
 
     private void Awake()
     {
@@ -55,4 +58,9 @@ public class TruckEventDoneArgs : EventArgs
     {
         this.truckSide = truckSide;
     }
+}
+
+public class TruckTakePrizeArgs : EventArgs
+{
+
 }

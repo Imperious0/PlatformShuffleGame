@@ -62,21 +62,21 @@ MonoBehaviour:
   m_AssetVersion: 1
   m_OpaqueLayerMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 2147483647
   m_TransparentLayerMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 2147483647
   m_DefaultStencilState:
     overrideStencilState: 0
-    stencilReference: 0
+    stencilReference: 5
     stencilCompareFunction: 8
     passOperation: 2
     failOperation: 0
     zFailOperation: 0
-  m_ShadowTransparentReceive: 1
+  m_ShadowTransparentReceive: 0
   m_RenderingMode: 0
   m_DepthPrimingMode: 0
-  m_AccurateGbufferNormals: 0
+  m_AccurateGbufferNormals: 1
   m_ClusteredRendering: 0
   m_TileSize: 32
   m_IntermediateTextureMode: 0
