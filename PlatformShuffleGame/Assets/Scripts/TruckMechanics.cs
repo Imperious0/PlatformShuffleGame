@@ -7,8 +7,11 @@ public class TruckMechanics : MonoBehaviour
     public event EventHandler<TruckEventDoneArgs> TruckDoneMissionEvent;
     public event EventHandler<TruckTakePrizeArgs> TruckTakePrizeEvent;
 
+    [SerializeField] private Vector2 _index;
     [SerializeField] private Vector3 _carStartPoint = Vector3.zero;
     [SerializeField] private Vector3 _carPositionOffset = Vector3.zero;
+
+    bool isMaybeSwizzling = false;
 
     List<CarController> _cars;
 
@@ -21,10 +24,19 @@ public class TruckMechanics : MonoBehaviour
     public CarController PopCar()
     {
         if (_cars.Count <= 0)
+        {
+            if (!isMaybeSwizzling)
+            {
+                isMaybeSwizzling = true;
+                TruckDoneMissionEvent?.Invoke(this, new TruckEventDoneArgs(_index));
+            }
             return null;
+        }
+
 
         CarController tmp = _cars[_cars.Count - 1];
         _cars.RemoveAt(_cars.Count - 1);
+
 
         return tmp;
     }
@@ -32,6 +44,9 @@ public class TruckMechanics : MonoBehaviour
     {
         if (t == null)
             return;
+
+        if (_cars.Count <= 0)
+            TruckDoneMissionEvent?.Invoke(this, new TruckEventDoneArgs(-_index));
 
         int row = _cars.Count / 3;
         int col = _cars.Count % 3;

@@ -6,17 +6,31 @@ public class GameManager : MonoBehaviour
 {
     public event EventHandler<ShuffleEventArgs> ShuffleEvent;
 
-    private static GameManager instance = null;
+    public event EventHandler<SecondPhaseArgs> SecondPhaseEvent;
+    public event EventHandler<EventArgs> ThirdPhaseEvent;
 
+    public event EventHandler<EventArgs> GameOverEvent;
+
+    private static GameManager instance = null;
     public static GameManager Instance { get => instance; }
 
-
+    //OutSources
     [SerializeField] private MotionCapturer mCapture;
 
     [SerializeField, Range(0, 1f)] private float _carShuffleDelay = 0.25f;
+
+    [SerializeField] private float _remainingTime = 30f;
+    
+    private Coroutine _swipeHandler;
+
+
     private int _roadInstanceCount = 12;
+    private Vector3 _endlinePos = Vector3.zero;
+    private bool _roadRunnerEnd = false;
+
 
     public int RoadInstanceCount { get => _roadInstanceCount; }
+    public float RemainingTime { get => _remainingTime; }
 
     private void Awake()
     {
@@ -24,7 +38,12 @@ public class GameManager : MonoBehaviour
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
-            _roadInstanceCount = GameObject.FindGameObjectsWithTag("Road").Length;
+            GameObject[] _roadInstances = GameObject.FindGameObjectsWithTag("Road");
+            _roadInstanceCount = _roadInstances.Length;
+            foreach (var item in _roadInstances) 
+            {
+                item.GetComponent<RoadController>().PositionChangeEvent += RoadPositionChangeListener;
+            }
         }
         else
         {
@@ -33,9 +52,27 @@ public class GameManager : MonoBehaviour
     }
     private void Start()
     {
-        StartCoroutine(SwipeHandler());
-    }
+        _swipeHandler = StartCoroutine(SwipeHandler());
 
+        TruckController tmp = GameObject.FindGameObjectWithTag("Truck").GetComponent<TruckController>();
+        tmp.TrucksEmptyEvent += IsTruckEmptyListener;
+        tmp.TruckHitsEndLineEvent += IsTruckEndsTheLineListener;
+    }
+    private void Update()
+    {
+        if(RemainingTime < 10f)
+        {
+            if (!_roadRunnerEnd)
+            {
+                _roadRunnerEnd = true;
+                SecondPhaseEvent?.Invoke(this, new SecondPhaseArgs(_endlinePos));
+                Debug.LogError("Game Status: Second Phase");
+            }
+        }else
+        {
+            _remainingTime -= Time.deltaTime;
+        }
+    }
     private IEnumerator SwipeHandler()
     {
         while (true)
@@ -52,6 +89,23 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+    private void IsTruckEmptyListener(object sender, EventArgs e)
+    {
+        GameOverEvent?.Invoke(this, EventArgs.Empty);
+        StopCoroutine(_swipeHandler);
+        Debug.LogError("GameOver: TruckEmpty");
+    }
+    private void IsTruckEndsTheLineListener(object sender, EventArgs e)
+    {
+        //Stop Game First
+        GameOverEvent?.Invoke(this, EventArgs.Empty);
+        //Triggered Game Over
+        ThirdPhaseEvent?.Invoke(this, EventArgs.Empty);
+    }
+    private void RoadPositionChangeListener(object sender, PositionChangeArgs e)
+    {
+        _endlinePos = e.CurrentPos;
+    }
 }
 
 public class ShuffleEventArgs : EventArgs 
@@ -65,3 +119,15 @@ public class ShuffleEventArgs : EventArgs
         this.isShufleRight = isShufleRight;
     }
 }
+
+public class SecondPhaseArgs : EventArgs
+{
+    private Vector3 _endLinePos = Vector3.zero;
+    public Vector3 EndLinePos { get => _endLinePos; }
+
+    public SecondPhaseArgs(Vector3 endLinePos)
+    {
+        _endLinePos = endLinePos;
+    }
+}
+

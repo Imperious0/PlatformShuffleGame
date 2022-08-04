@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class TruckCollector : MonoBehaviour
@@ -7,10 +8,14 @@ public class TruckCollector : MonoBehaviour
     {
         if (other.transform != null)
         {
-
             IContactable t = other.transform.GetComponent(typeof(IContactable)) as IContactable;
             if (t != null)
                 t.InteractOTG(_truckInteractID);
         }
+    }
+
+    private void SecondPhaseListener(object sender, EventArgs e)
+    {
+
     }
 }

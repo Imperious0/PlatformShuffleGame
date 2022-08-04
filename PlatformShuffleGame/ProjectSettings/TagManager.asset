@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Road
   - Reward
+  - Truck
   layers:
   - Default
   - TransparentFX

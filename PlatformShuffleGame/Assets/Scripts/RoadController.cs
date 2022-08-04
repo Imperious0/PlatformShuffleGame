@@ -10,6 +10,7 @@ public class RoadController : MonoBehaviour, IContactable
 
     public event EventHandler<HideEventArgs> HideEvent;
     public event EventHandler<SeekEventArgs> SeekEvent;
+    public event EventHandler<PositionChangeArgs> PositionChangeEvent;
 
     private int childCount = 4;
     private int decisionCount = 2;
@@ -27,12 +28,13 @@ public class RoadController : MonoBehaviour, IContactable
     }
     public void InteractOTG()
     {
-        Debug.LogError("Interacted");
+
         _collider.enabled = false;
         HideEvent?.Invoke(this, new HideEventArgs());
         _transform.localPosition += RoadOffset * GameManager.Instance.RoadInstanceCount;
         SeekEvent?.Invoke(this, new SeekEventArgs(childCount, decisionCount));
         _collider.enabled = true;
+        PositionChangeEvent?.Invoke(this, new PositionChangeArgs(_transform.position + (RoadOffset / 2)));
     }
 
     public void InteractOTG(int index)
@@ -66,4 +68,15 @@ public class SeekEventArgs : EventArgs
     }
     public int[] VisibleObjectArray { get => _visibleObjectArray; }
     public int[] VisibleDecisionArray { get => _visibleDecisionArray; }
+}
+public class PositionChangeArgs : EventArgs
+{
+    private Vector3 _currentPos = Vector3.zero;
+
+    public PositionChangeArgs(Vector3 currentPos)
+    {
+        _currentPos = currentPos;
+    }
+
+    public Vector3 CurrentPos { get => _currentPos; }
 }

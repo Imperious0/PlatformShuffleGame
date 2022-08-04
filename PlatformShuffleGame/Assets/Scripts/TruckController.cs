@@ -1,13 +1,19 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class TruckController : MonoBehaviour
 {
+    public event EventHandler<EventArgs> TrucksEmptyEvent;
+    public event EventHandler<EventArgs> TruckHitsEndLineEvent;
+
     [SerializeField] private float _trucksOffset = 5f;
     [SerializeField] private float _truckSpeed = 0.5f;
 
     [SerializeField, Space] private TruckMechanics lTruck;
     [SerializeField] private TruckMechanics rTruck;
+    [SerializeField] private TruckLooper looper;
+
 
     [SerializeField, Space] private Transform carStack;
     [SerializeField] private List<GameObject> carPrefabs;
@@ -15,14 +21,17 @@ public class TruckController : MonoBehaviour
     private Transform _transform;
     private List<CarController> AvailableCarStack;
 
-
-    private Vector2 awaitTrucks = Vector2.zero;
+    //First Cars Removes Its Truck Index So When Game Starts awaitTrucks became Vector2.zero;
+    private Vector2 awaitTrucks = Vector2.one;
 
     private bool isMovementNecessary = true;
     private void Awake()
     {
         _transform = transform;
         AvailableCarStack = new List<CarController>();
+
+
+        looper.HitEndlineEvent += HitsEndlineListener;
         foreach (var item in GameObject.FindGameObjectsWithTag("Reward"))
         {
             IPrize p = item.GetComponent(typeof(IPrize)) as IPrize;
@@ -34,7 +43,7 @@ public class TruckController : MonoBehaviour
     private void Start()
     {
         GameManager.Instance.ShuffleEvent += ShuffleEventListener;
-
+        GameManager.Instance.GameOverEvent += GameOverListener;
         if (lTruck != null)
         {
             lTruck.transform.position = new Vector3(-_trucksOffset, lTruck.transform.position.y, lTruck.transform.position.z);
@@ -57,19 +66,32 @@ public class TruckController : MonoBehaviour
         if(isMovementNecessary)
             _transform.position = _transform.position + Vector3.forward * _truckSpeed;
     }
-    private void IsTruckDone(object sender, TruckEventDoneArgs e)
-    {
-        awaitTrucks += e.TruckSide;
-        if (awaitTrucks.Equals(Vector2.one))
-            isMovementNecessary = false;
-    }
-
-    private void ShuffleEventListener(object sender, ShuffleEventArgs e) 
+    private void ShuffleEventListener(object sender, ShuffleEventArgs e)
     {
         if (e.IsShufleRight)
             rTruck.PushCar(lTruck.PopCar());
         else
             lTruck.PushCar(rTruck.PopCar());
+    }
+
+    private void GameOverListener(object sender, EventArgs e) 
+    {
+        isMovementNecessary = false;
+    }
+    private void IsTruckDone(object sender, TruckEventDoneArgs e)
+    {
+        awaitTrucks += e.TruckSide;
+        if (awaitTrucks.Equals(Vector2.one))
+        {
+            isMovementNecessary = false;
+            TrucksEmptyEvent?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    private void HitsEndlineListener(object sender, EventArgs e)
+    {
+        Debug.LogError("Hits Endline");
+        TruckHitsEndLineEvent?.Invoke(this, EventArgs.Empty);
     }
 
     private void AddNewCar(TruckMechanics t, int Amount)
@@ -85,7 +107,7 @@ public class TruckController : MonoBehaviour
             }
             else
             {
-                tmp = Instantiate(carPrefabs[Random.Range(0, carPrefabs.Count)], carStack, false).GetComponent<CarController>();
+                tmp = Instantiate(carPrefabs[UnityEngine.Random.Range(0, carPrefabs.Count)], carStack, false).GetComponent<CarController>();
             }
 
             t.PushCar(tmp, true);

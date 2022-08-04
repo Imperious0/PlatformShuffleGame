@@ -34,6 +34,7 @@ public class PrizeDoor : MonoBehaviour, IVisibleObject, IContactable, IPrize
         _transform = transform;
         _initialPosition = _transform.localPosition;
         _desiredPosition = _initialPosition;
+
         transform.parent.GetComponent<RoadController>().HideEvent += Hide;
         transform.parent.GetComponent<RoadController>().SeekEvent += Seek;
     }
@@ -100,6 +101,7 @@ public class PrizeDoor : MonoBehaviour, IVisibleObject, IContactable, IPrize
         Array values = Enum.GetValues(typeof(PrizeType));
         System.Random random = new System.Random();
         _pType = (PrizeType)values.GetValue(random.Next(values.Length));
+
         _collider.enabled = true;
         _renderer.enabled = true;
         _prizeText.enabled = true;
