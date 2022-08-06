@@ -4,7 +4,9 @@ public class TruckUnloader : MonoBehaviour, IContactable
 {
     [SerializeField] private Transform _lPark;
     [SerializeField] private Transform _rPark;
+    [SerializeField] private bool _isEndUnloader = false;
 
+    public bool IsEndUnloader { get => _isEndUnloader; }
     public void InteractOTG()
     {
 

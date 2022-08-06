@@ -38,7 +38,7 @@ public class TruckLooper : MonoBehaviour
             if(tmp != null)
             {
                 Transform[] Parks = tmp.getCarParks();
-                HitTruckUnloadEvent?.Invoke(this, new CarUnloadArgs(Parks[0], Parks[1]));
+                HitTruckUnloadEvent?.Invoke(this, new CarUnloadArgs(Parks[0], Parks[1], tmp.IsEndUnloader));
             }
 
         }
@@ -55,13 +55,15 @@ public class CarUnloadArgs : EventArgs
 {
     private Transform _lParkTransform;
     private Transform _rParkTransform;
+    private bool _isEndUnloader = false;
 
-    public CarUnloadArgs(Transform lParkTransform, Transform rParkTransform)
+    public CarUnloadArgs(Transform lParkTransform, Transform rParkTransform, bool isEndUnloader)
     {
         _lParkTransform = lParkTransform;
         _rParkTransform = rParkTransform;
+        _isEndUnloader = isEndUnloader;
     }
-
     public Transform LParkTransform { get => _lParkTransform; }
     public Transform RParkTransform { get => _rParkTransform; }
+    public bool IsEndUnloader { get => _isEndUnloader; }
 }

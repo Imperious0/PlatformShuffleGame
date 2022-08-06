@@ -197,9 +197,22 @@ public class TruckController : MonoBehaviour
             lCar.MoveNextPos(e.LParkTransform.position);
             lCar.transform.SetParent(null, true);
         }
-        if (lCar == null && rCar == null || lTruck.CarAmount <= 0 && rTruck.CarAmount <= 0)
+        if (lCar == null && rCar == null || lTruck.CarAmount <= 0 && rTruck.CarAmount <= 0 || e.IsEndUnloader)
         {
             isMovementNecessary = false;
+            CarController tmp = null;
+            while(lTruck.CarAmount > 0)
+            {
+                tmp = lTruck.PopCar();
+                _finalizedCarMess += tmp.CarMess;
+                tmp.Die();
+            }
+            while (rTruck.CarAmount > 0)
+            {
+                tmp = rTruck.PopCar();
+                _finalizedCarMess += tmp.CarMess;
+                tmp.Die();
+            }
             TruckUnloadedCargoEvent?.Invoke(this, new TruckUnloadArgs(_finalizedCarMess));
             foreach (ParticleSystem item in _confetty)
             {
