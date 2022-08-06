@@ -42,6 +42,7 @@ public class CarController : MonoBehaviour
     {
         _transform.localPosition = nextPos;
         _nextPosition = nextPos;
+        _transform.localRotation = Quaternion.identity;
         _renderer.enabled = true;
 
 
@@ -57,6 +58,7 @@ public class CarController : MonoBehaviour
 
     public void Die()
     {
+
         gameObject.SetActive(false);
     }
     public void Respawn()

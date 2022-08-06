@@ -6,6 +6,7 @@ public class TruckController : MonoBehaviour
 {
     public event EventHandler<EventArgs> TrucksEmptyEvent;
     public event EventHandler<EventArgs> TruckHitsEndLineEvent;
+    public event EventHandler<TruckUnloadArgs> TruckUnloadedCargoEvent;
 
     [SerializeField] private float _trucksOffset = 5f;
     [SerializeField] private float _truckSpeed = 0.5f;
@@ -30,8 +31,6 @@ public class TruckController : MonoBehaviour
         _transform = transform;
         AvailableCarStack = new List<CarController>();
 
-
-        looper.HitEndlineEvent += HitsEndlineListener;
         foreach (var item in GameObject.FindGameObjectsWithTag("Reward"))
         {
             IPrize p = item.GetComponent(typeof(IPrize)) as IPrize;
@@ -44,10 +43,11 @@ public class TruckController : MonoBehaviour
     {
         GameManager.Instance.ShuffleEvent += ShuffleEventListener;
         GameManager.Instance.GameOverEvent += GameOverListener;
+
+        looper.HitEndlineEvent += HitsEndlineListener;
         if (lTruck != null)
         {
             lTruck.transform.position = new Vector3(-_trucksOffset, lTruck.transform.position.y, lTruck.transform.position.z);
-            lTruck.TruckDoneMissionEvent += IsTruckDone;
             AddNewCar(lTruck,1);
             AddNewCar(lTruck,1);
             AddNewCar(lTruck,1);
@@ -55,7 +55,6 @@ public class TruckController : MonoBehaviour
         if (rTruck != null)
         {
             rTruck.transform.position = new Vector3(_trucksOffset, rTruck.transform.position.y, rTruck.transform.position.z);
-            rTruck.TruckDoneMissionEvent += IsTruckDone;
             AddNewCar(rTruck,1);
             AddNewCar(rTruck,1);
             AddNewCar(rTruck,1);
@@ -66,39 +65,19 @@ public class TruckController : MonoBehaviour
         if(isMovementNecessary)
             _transform.position = _transform.position + Vector3.forward * _truckSpeed;
     }
-    private void ShuffleEventListener(object sender, ShuffleEventArgs e)
-    {
-        if (e.IsShufleRight)
-            rTruck.PushCar(lTruck.PopCar());
-        else
-            lTruck.PushCar(rTruck.PopCar());
-    }
-
-    private void GameOverListener(object sender, EventArgs e) 
-    {
-        isMovementNecessary = false;
-    }
-    private void IsTruckDone(object sender, TruckEventDoneArgs e)
-    {
-        awaitTrucks += e.TruckSide;
-        if (awaitTrucks.Equals(Vector2.one))
-        {
-            isMovementNecessary = false;
-            TrucksEmptyEvent?.Invoke(this, EventArgs.Empty);
-        }
-    }
-
-    private void HitsEndlineListener(object sender, EventArgs e)
-    {
-        Debug.LogError("Hits Endline");
-        TruckHitsEndLineEvent?.Invoke(this, EventArgs.Empty);
-    }
 
     private void AddNewCar(TruckMechanics t, int Amount)
     {
         CarController tmp = null;
         for (int i = 0; i < Amount; i++)
         {
+            if(t==null)
+            {
+                tmp = Instantiate(carPrefabs[UnityEngine.Random.Range(0, carPrefabs.Count)], carStack, false).GetComponent<CarController>();
+                AvailableCarStack.Add(tmp);
+                tmp.Die();
+                continue;
+            }
             if (AvailableCarStack.Count > 0)
             {
                 tmp = AvailableCarStack[AvailableCarStack.Count - 1];
@@ -107,9 +86,9 @@ public class TruckController : MonoBehaviour
             }
             else
             {
-                tmp = Instantiate(carPrefabs[UnityEngine.Random.Range(0, carPrefabs.Count)], carStack, false).GetComponent<CarController>();
+                AddNewCar(null, Amount + 20);
+                AddNewCar(t, Amount);
             }
-
             t.PushCar(tmp, true);
         }
 
@@ -126,8 +105,23 @@ public class TruckController : MonoBehaviour
             AvailableCarStack.Add(tmp);
             tmp.Die();
         }
-        
     }
+    #region OutsourceListeners
+    private void ShuffleEventListener(object sender, ShuffleEventArgs e)
+    {
+        if (e.IsShufleRight)
+            rTruck.PushCar(lTruck.PopCar());
+        else
+            lTruck.PushCar(rTruck.PopCar());
+    }
+
+    private void GameOverListener(object sender, EventArgs e)
+    {
+        isMovementNecessary = false;
+    }
+    #endregion
+
+    #region InHouseListeners
     private void RewardCollectedEventListener(object sender, PrizeCollectedArgs e)
     {
         TruckMechanics t = null;
@@ -156,5 +150,24 @@ public class TruckController : MonoBehaviour
                 RemoveCar(t, (int)estamiedAmount2);
                 break;
         }
+        if(rTruck.CarAmount + lTruck.CarAmount <= 0)
+            TrucksEmptyEvent?.Invoke(this, EventArgs.Empty);
+    }
+    private void HitsEndlineListener(object sender, EventArgs e)
+    {
+        Debug.LogError("Hits Endline");
+        TruckHitsEndLineEvent?.Invoke(this, EventArgs.Empty);
+    }
+    #endregion
+}
+public class TruckUnloadArgs : EventArgs
+{
+    private int _totalMess = 0;
+
+    public int TotalMess { get => _totalMess; }
+
+    public TruckUnloadArgs(int totalMess)
+    {
+        _totalMess = totalMess;
     }
 }

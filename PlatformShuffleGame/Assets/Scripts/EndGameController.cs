@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class EndGameController : MonoBehaviour
@@ -10,7 +9,6 @@ public class EndGameController : MonoBehaviour
     }
     private void SecondPhaseListener(object sender, SecondPhaseArgs e)
     {
-        
         transform.position = e.EndLinePos + endlineOffset;
     }
 }

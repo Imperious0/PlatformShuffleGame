@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     public event EventHandler<EventArgs> ThirdPhaseEvent;
 
     public event EventHandler<EventArgs> GameOverEvent;
+    public event EventHandler<GameWonEventArgs> GameWonEvent;
 
     private static GameManager instance = null;
     public static GameManager Instance { get => instance; }
@@ -27,6 +28,8 @@ public class GameManager : MonoBehaviour
     private int _roadInstanceCount = 12;
     private Vector3 _endlinePos = Vector3.zero;
     private bool _roadRunnerEnd = false;
+
+    private int _EndGameCarCount = 0;
 
 
     public int RoadInstanceCount { get => _roadInstanceCount; }
@@ -57,7 +60,10 @@ public class GameManager : MonoBehaviour
         TruckController tmp = GameObject.FindGameObjectWithTag("Truck").GetComponent<TruckController>();
         tmp.TrucksEmptyEvent += IsTruckEmptyListener;
         tmp.TruckHitsEndLineEvent += IsTruckEndsTheLineListener;
+        tmp.TruckUnloadedCargoEvent += IsTruckTotallyUnloadedListener;
     }
+
+
     private void Update()
     {
         if(RemainingTime < 10f)
@@ -89,6 +95,7 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+    #region OutSource Listeners
     private void IsTruckEmptyListener(object sender, EventArgs e)
     {
         GameOverEvent?.Invoke(this, EventArgs.Empty);
@@ -98,13 +105,31 @@ public class GameManager : MonoBehaviour
     private void IsTruckEndsTheLineListener(object sender, EventArgs e)
     {
         //Stop Game First
-        GameOverEvent?.Invoke(this, EventArgs.Empty);
+        _EndGameCarCount = e.CarCount;
         //Triggered Game Over
         ThirdPhaseEvent?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void IsTruckTotallyUnloadedListener(object sender, EventArgs e)
+    {
+        GameWonEvent?.Invoke(this, new GameWonEventArgs());
     }
     private void RoadPositionChangeListener(object sender, PositionChangeArgs e)
     {
         _endlinePos = e.CurrentPos;
+    }
+    #endregion
+}
+
+public class GameWonEventArgs : EventArgs
+{
+    private int _LevelScore = 0;
+
+    public int LevelScore { get => _LevelScore; }
+
+    public GameWonEventArgs(int levelScore)
+    {
+        _LevelScore = levelScore;
     }
 }
 
