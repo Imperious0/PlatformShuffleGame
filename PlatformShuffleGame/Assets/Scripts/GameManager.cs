@@ -29,9 +29,6 @@ public class GameManager : MonoBehaviour
     private Vector3 _endlinePos = Vector3.zero;
     private bool _roadRunnerEnd = false;
 
-    private int _EndGameCarCount = 0;
-
-
     public int RoadInstanceCount { get => _roadInstanceCount; }
     public float RemainingTime { get => _remainingTime; }
 
@@ -40,7 +37,7 @@ public class GameManager : MonoBehaviour
         if(Instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(gameObject);
+
             GameObject[] _roadInstances = GameObject.FindGameObjectsWithTag("Road");
             _roadInstanceCount = _roadInstances.Length;
             foreach (var item in _roadInstances) 
@@ -105,14 +102,15 @@ public class GameManager : MonoBehaviour
     private void IsTruckEndsTheLineListener(object sender, EventArgs e)
     {
         //Stop Game First
-        _EndGameCarCount = e.CarCount;
+        
         //Triggered Game Over
         ThirdPhaseEvent?.Invoke(this, EventArgs.Empty);
     }
 
-    private void IsTruckTotallyUnloadedListener(object sender, EventArgs e)
+    private void IsTruckTotallyUnloadedListener(object sender, TruckUnloadArgs e)
     {
-        GameWonEvent?.Invoke(this, new GameWonEventArgs());
+        GameWonEvent?.Invoke(this, new GameWonEventArgs(e.TotalMess));
+
     }
     private void RoadPositionChangeListener(object sender, PositionChangeArgs e)
     {

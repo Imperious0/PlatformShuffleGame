@@ -125,8 +125,8 @@ MonoBehaviour:
     rgba: 3291821562
   _pText: +
   _prizeAmount: 1
-  _prizeAmountPrimitiveMax: 15
-  _prizeAmountComplexMax: 4
+  _prizeAmountPrimitiveMax: 3
+  _prizeAmountComplexMax: 2
 --- !u!1 &5369845323170921682
 GameObject:
   m_ObjectHideFlags: 0
@@ -491,8 +491,8 @@ MonoBehaviour:
     rgba: 3291821562
   _pText: +
   _prizeAmount: 1
-  _prizeAmountPrimitiveMax: 15
-  _prizeAmountComplexMax: 4
+  _prizeAmountPrimitiveMax: 3
+  _prizeAmountComplexMax: 2
 --- !u!1 &8349806294163639201
 GameObject:
   m_ObjectHideFlags: 0

@@ -14,7 +14,7 @@ public class TruckController : MonoBehaviour
     [SerializeField, Space] private TruckMechanics lTruck;
     [SerializeField] private TruckMechanics rTruck;
     [SerializeField] private TruckLooper looper;
-
+    [SerializeField] private ParticleSystem[] _confetty;
 
     [SerializeField, Space] private Transform carStack;
     [SerializeField] private List<GameObject> carPrefabs;
@@ -24,6 +24,8 @@ public class TruckController : MonoBehaviour
 
     //First Cars Removes Its Truck Index So When Game Starts awaitTrucks became Vector2.zero;
     private Vector2 awaitTrucks = Vector2.one;
+
+    private int _finalizedCarMess = 0;
 
     private bool isMovementNecessary = true;
     private void Awake()
@@ -43,8 +45,9 @@ public class TruckController : MonoBehaviour
     {
         GameManager.Instance.ShuffleEvent += ShuffleEventListener;
         GameManager.Instance.GameOverEvent += GameOverListener;
-
+        GameManager.Instance.ThirdPhaseEvent += TruckUnloadPhaseListener;
         looper.HitEndlineEvent += HitsEndlineListener;
+        looper.HitTruckUnloadEvent += HitsTruckUnloadListener;
         if (lTruck != null)
         {
             lTruck.transform.position = new Vector3(-_trucksOffset, lTruck.transform.position.y, lTruck.transform.position.z);
@@ -60,6 +63,7 @@ public class TruckController : MonoBehaviour
             AddNewCar(rTruck,1);
         }
     }
+
     private void FixedUpdate()
     {
         if(isMovementNecessary)
@@ -119,6 +123,10 @@ public class TruckController : MonoBehaviour
     {
         isMovementNecessary = false;
     }
+    private void TruckUnloadPhaseListener(object sender, EventArgs e)
+    {
+        isMovementNecessary = true;
+    }
     #endregion
 
     #region InHouseListeners
@@ -155,8 +163,50 @@ public class TruckController : MonoBehaviour
     }
     private void HitsEndlineListener(object sender, EventArgs e)
     {
-        Debug.LogError("Hits Endline");
+        isMovementNecessary = false;
+        TruckMechanics SwizzleTruck = lTruck;
+        TruckMechanics SwizzlingTruck = rTruck;
+        if (rTruck.CarAmount < lTruck.CarAmount)
+        {
+            SwizzleTruck = rTruck;
+            SwizzlingTruck = lTruck;
+        }
+        int difference = Mathf.FloorToInt(Math.Abs(SwizzlingTruck.CarAmount - SwizzleTruck.CarAmount) / 2f);
+        for (int i = 0; i < difference; i++)
+        {
+            SwizzleTruck.PushCar(SwizzlingTruck.PopCar());
+        }
+
         TruckHitsEndLineEvent?.Invoke(this, EventArgs.Empty);
+        Debug.LogError("Hits Endline");
+    }
+    private void HitsTruckUnloadListener(object sender, CarUnloadArgs e)
+    {
+        CarController lCar = lTruck.PopCar();
+        CarController rCar = rTruck.PopCar();
+
+        if(rCar != null)
+        {
+            _finalizedCarMess += rCar.CarMess;
+            rCar.transform.SetParent(null, true);
+            rCar.MoveNextPos(e.RParkTransform.position);
+        }
+        if(lCar != null)
+        {
+            _finalizedCarMess += lCar.CarMess;
+            lCar.MoveNextPos(e.LParkTransform.position);
+            lCar.transform.SetParent(null, true);
+        }
+        if (lCar == null && rCar == null || lTruck.CarAmount <= 0 && rTruck.CarAmount <= 0)
+        {
+            isMovementNecessary = false;
+            TruckUnloadedCargoEvent?.Invoke(this, new TruckUnloadArgs(_finalizedCarMess));
+            foreach (ParticleSystem item in _confetty)
+            {
+                item.Play();
+            }
+            return;
+        }
     }
     #endregion
 }

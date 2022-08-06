@@ -16,6 +16,6 @@ public class TruckCollector : MonoBehaviour
 
     private void SecondPhaseListener(object sender, EventArgs e)
     {
-
+        
     }
 }

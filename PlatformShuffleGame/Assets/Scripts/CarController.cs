@@ -15,6 +15,9 @@ public class CarController : MonoBehaviour
 
     [SerializeField, Range(0,5)] private float _carAnimationSpeed = 0.125f;
 
+    [SerializeField] private int _carMess = 5;
+    public int CarMess { get => _carMess; }
+
     private void Awake()
     {
         _transform = transform;
@@ -58,7 +61,6 @@ public class CarController : MonoBehaviour
 
     public void Die()
     {
-
         gameObject.SetActive(false);
     }
     public void Respawn()

@@ -9,6 +9,7 @@ public class TruckLooper : MonoBehaviour
     private bool isItDone = false;
 
     public event EventHandler<EventArgs> HitEndlineEvent;
+    public event EventHandler<CarUnloadArgs> HitTruckUnloadEvent;
 
     private void Awake()
     {
@@ -31,6 +32,16 @@ public class TruckLooper : MonoBehaviour
         {
             HitEndlineEvent?.Invoke(this, EventArgs.Empty);
         }
+        if (other.CompareTag("TruckUnload"))
+        {
+            TruckUnloader tmp = other.GetComponent(typeof(IContactable)) as TruckUnloader;
+            if(tmp != null)
+            {
+                Transform[] Parks = tmp.getCarParks();
+                HitTruckUnloadEvent?.Invoke(this, new CarUnloadArgs(Parks[0], Parks[1]));
+            }
+
+        }
     }
     private void SecondPhaseListener(object sender, EventArgs e)
     {
@@ -38,4 +49,19 @@ public class TruckLooper : MonoBehaviour
         _collider.center = new Vector3(_collider.center.x, _collider.center.y, 5f);
         
     }
+}
+
+public class CarUnloadArgs : EventArgs
+{
+    private Transform _lParkTransform;
+    private Transform _rParkTransform;
+
+    public CarUnloadArgs(Transform lParkTransform, Transform rParkTransform)
+    {
+        _lParkTransform = lParkTransform;
+        _rParkTransform = rParkTransform;
+    }
+
+    public Transform LParkTransform { get => _lParkTransform; }
+    public Transform RParkTransform { get => _rParkTransform; }
 }
